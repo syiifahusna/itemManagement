@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Item</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link th:href="@{'/assets/vendor/bootstrap/css/bootstrap.min.css'}" rel="stylesheet">
+  <link th:href="@{'/assets/vendor/bootstrap-icons/bootstrap-icons.css'}" rel="stylesheet">
+  <link th:href="@{'/assets/vendor/simple-datatables/style.css'}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link th:href="@{'/assets/css/style.css'}" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: NiceAdmin
+  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+  * Updated: Apr 20 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body>
+
+<div th:insert="~{user/fragment/header_footer :: navigation}"></div>
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Item</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{'/user/dashboard'}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a th:href="@{'/client/items'}">Items</a></li>
+        <li class="breadcrumb-item active">Item</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section Dashboard">
+    <div class="col-lg-12">
+      <div class="row">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Item</h5>
+            <div th:if="${responseMessage != null && responseMessage.operationStatusEnum == T(com.itemManagement.enums.OperationStatusEnum).SUCCESS}">
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${responseMessage.message}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            </div>
+            <div th:if="${responseMessage != null && responseMessage.operationStatusEnum == T(com.itemManagement.enums.OperationStatusEnum).FAILED}">
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${responseMessage.message}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            </div>
+
+            <div>
+              <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <p th:text="${item.name}" name="name" id="name"></p>
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <p  th:text="${item.description}" name="description" id="description" ></p>
+              </div>
+              <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <p  th:text="${item.price}" name="price" id="price" ></p>
+              </div>
+              <div class="mb-3">
+                <a class="btn btn-success" th:href="@{'/client/addtocart?id=' + ${item.id}}">Add To Cart</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main><!-- End #main -->
+
+<div th:insert="~{user/fragment/header_footer :: footer}"></div>
+
+</body>
+
+</html>
