@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Settings</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link th:href="@{'/assets/vendor/bootstrap/css/bootstrap.min.css'}" rel="stylesheet">
+    <link th:href="@{'/assets/vendor/bootstrap-icons/bootstrap-icons.css'}" rel="stylesheet">
+    <link th:href="@{'/assets/vendor/simple-datatables/style.css'}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link th:href="@{'/assets/css/style.css'}" rel="stylesheet">
+
+    <!-- =======================================================
+    * Template Name: NiceAdmin
+    * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+    * Updated: Apr 20 2024 with Bootstrap v5.3.3
+    * Author: BootstrapMade.com
+    * License: https://bootstrapmade.com/license/
+    ======================================================== -->
+</head>
+
+<body>
+
+<div th:insert="~{user/fragment/header_footer :: navigation}"></div>
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Settings</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a>Settings</a></li>
+                <li class="breadcrumb-item active">Mailing Settings</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section Dashboard">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Mailing Settings</h5>
+                        <div th:if="${responseMessage != null && responseMessage.operationStatusEnum == T(com.itemManagement.enums.OperationStatusEnum).SUCCESS}">
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <span th:text="${responseMessage.message}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </div>
+                        <div th:if="${responseMessage != null && responseMessage.operationStatusEnum == T(com.itemManagement.enums.OperationStatusEnum).FAILED}">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <span th:text="${responseMessage.message}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </div>
+                        <div>
+                            <!-- Host -->
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <p class="mb-0"><strong>Host:</strong> <span th:text="${mailing.host}"></span></p>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editHostModal">Edit</button>
+                            </div>
+                            <!-- Port -->
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <p class="mb-0"><strong>Port:</strong> <span th:text="${mailing.port}"></span></p>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPortModal">Edit</button>
+                            </div>
+                            <!-- Username -->
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <p class="mb-0"><strong>Username:</strong> <span th:text="${mailing.username}"></span></p>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editUsernameModal">Edit</button>
+                            </div>
+                            <!-- Password -->
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <p class="mb-0"><strong>Password:</strong> <span></span></p>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPasswordModal">Edit</button>
+                            </div>
+                            <!-- Protocol -->
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <p class="mb-0"><strong>Protocol:</strong> <span th:text="${mailing.protocol}"></span></p>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProtocolModal">Edit</button>
+                            </div>
+
+
+                            <!-- Authenticate -->
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <p class="mb-0"><strong>Authenticate:</strong> <span th:text="${mailing.auth ? 'Enabled' : 'Disabled'}"></span></p>
+                                <form th:action="@{/admin/settings/mailing/updateauth}" th:method="post">
+                                    <button class="btn btn-primary btn-sm" th:if="${mailing.auth == false}" name="auth" value="true">Enable</button>
+                                    <button class="btn btn-danger btn-sm" th:if="${mailing.auth == true}" name="auth" value="false">Disable</button>
+                                </form>
+
+                            </div>
+                            <!-- Enable Tls -->
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <p class="mb-0"><strong>Enable Tls:</strong> <span th:text="${mailing.isTlsEnabled ? 'Enabled' : 'Disabled'}"></span></p>
+                                <form th:action="@{/admin/settings/mailing/updateenabletls}" th:method="post">
+                                    <button class="btn btn-primary btn-sm" th:if="${mailing.isTlsEnabled == false}" name="enableTls" value="true">Enable</button>
+                                    <button class="btn btn-danger btn-sm" th:if="${mailing.isTlsEnabled == true}" name="enableTls" value="false">Disable</button>
+                                </form>
+                            </div>
+                            <!-- Require Tls -->
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <p class="mb-0"><strong>Require Tls:</strong> <span th:text="${mailing.isTlsRequired ? 'Enabled' : 'Disabled'}"></span></p>
+                                <form th:action="@{/admin/settings/mailing/updaterequiretls}" th:method="post">
+                                    <button class="btn btn-primary btn-sm" th:if="${mailing.isTlsRequired == false}" name="requireTls" value="true">Enable</button>
+                                    <button class="btn btn-danger btn-sm" th:if="${mailing.isTlsRequired == true}" name="requireTls" value="false">Disable</button>
+                                </form>
+                            </div>
+                            <!-- Enable Debug -->
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <p class="mb-0"><strong>Enable Debug:</strong> <span th:text="${mailing.isDebugEnabled ? 'Enabled' : 'Disabled'}"></span></p>
+                                <form th:action="@{/admin/settings/mailing/updateenabledebug}" th:method="post">
+                                    <button class="btn btn-primary btn-sm" th:if="${mailing.isDebugEnabled == false}" name="enableDebug" value="true">Enable</button>
+                                    <button class="btn btn-danger btn-sm" th:if="${mailing.isDebugEnabled == true}" name="enableDebug" value="false">Disable</button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main><!-- End #main -->
+
+<!-- Edit Host Modal -->
+<div class="modal fade" id="editHostModal" tabindex="-1" aria-labelledby="editHostModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="hostForm" th:action="@{/admin/settings/mailing/updatehost}" th:method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editHostModalLabel">Edit Host</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" th:value="${mailing.host}" name="host" placeholder="Enter host">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Port Modal -->
+<div class="modal fade" id="editPortModal" tabindex="-1" aria-labelledby="editPortModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="portForm" th:action="@{/admin/settings/mailing/updateport}" th:method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPortModalLabel">Edit Port</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" th:value="${mailing.port}" name="port" placeholder="Enter port">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Username Modal -->
+<div class="modal fade" id="editUsernameModal" tabindex="-1" aria-labelledby="editUsernameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="usernameForm" th:action="@{/admin/settings/mailing/updateusername}" th:method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUsernameModalLabel">Edit Username</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" th:value="${mailing.username}" name="username" placeholder="Enter username">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Edit Password Modal -->
+<div class="modal fade" id="editPasswordModal" tabindex="-1" aria-labelledby="editPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="passwordForm" th:action="@{/admin/settings/mailing/updatepassword}" th:method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPasswordModalLabel">Edit Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="password" class="form-control mb-2" name="previousPassword" placeholder="Previous password">
+                    <input type="password" class="form-control mb-2" name="newPassword" placeholder="New password">
+                    <input type="password" class="form-control" name="confirmNewPassword" placeholder="Confirm new password">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Protocol Modal -->
+<div class="modal fade" id="editProtocolModal" tabindex="-1" aria-labelledby="editProtocolModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="protocolForm" th:action="@{/admin/settings/mailing/updateprotocol}" th:method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProtocolModalLabel">Edit Protocol</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-select" aria-label="Select protocol" th:value="${mailing.protocol}" id="protocol" name="protocol">
+                        <option value="imap" th:selected="${mailing.protocol == 'imap'}" name="protocol">IMAP (Internet Message Access Protocol)</option>
+                        <option value="pop3" th:selected="${mailing.protocol == 'pop3'}" name="protocol">POP3 (Post Office Protocol v3)</option>
+                        <option value="http/https" th:selected="${mailing.protocol == 'http/https'}" name="protocol">HTTP/HTTPS (Hypertext Transfer Protocol)</option>
+                        <option value="mapi" th:selected="${mailing.protocol == 'mapi'}" name="protocol">MAPI (Messaging Application Programming Interface)</option>
+                        <option value="eas" th:selected="${mailing.protocol == 'eas'}" name="protocol">Exchange ActiveSync (EAS)</option>
+                        <option value="nntp" th:selected="${mailing.protocol == 'nntp'}" name="protocol">NNTP (Network News Transfer Protocol)</option>
+                        <option value="lmtp" th:selected="${mailing.protocol == 'lmtp'}" name="protocol">LMTP (Local Mail Transfer Protocol)</option>
+                        <option value="smtp" th:selected="${mailing.protocol == 'smtp'}" name="protocol">SMTP Submission</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div th:insert="~{user/fragment/header_footer :: footer}"></div>
+
+<script>
+
+</script>
+
+</body>
+
+</html>

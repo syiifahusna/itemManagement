@@ -23,12 +23,14 @@ public class ClientService {
     public final ItemRepository itemRepository;
     private  final CartRepository cartRepository;
     private final OrderRepository orderRepository;
+    private final NotificationService notificationService;
 
 
-    public ClientService(ItemRepository itemRepository, CartRepository cartRepository, OrderRepository orderRepository) {
+    public ClientService(ItemRepository itemRepository, CartRepository cartRepository, OrderRepository orderRepository, NotificationService notificationService) {
         this.itemRepository = itemRepository;
         this.cartRepository = cartRepository;
         this.orderRepository = orderRepository;
+        this.notificationService = notificationService;
     }
 
 
@@ -166,6 +168,9 @@ public class ClientService {
         //save order and save cart items
         cartRepository.save(cart);
         Order newOrder = orderRepository.save(order);
+
+        //create notification
+        notificationService.saveNotification(newOrder.getId());
 
         return newOrder.getId();
     }
