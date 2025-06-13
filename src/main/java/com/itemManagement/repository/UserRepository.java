@@ -19,4 +19,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     Page<User> findByRoles_Authority(String authority, Pageable pageable);
 
+    List<User> findByIsEnabledTrueAndRolesAuthority(String authority);
+
 }

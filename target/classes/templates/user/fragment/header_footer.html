@@ -51,11 +51,21 @@
                         <i class="bi bi-bell"></i>
                         <span class="badge bg-primary badge-number" id="notification-badge">0</span>
                     </a><!-- End Notification Icon -->
-
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications" id="notification-menu">
-
-
-
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+                        <li class="dropdown-header" id="notification-header">
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <div class="notification-scroll" style="max-height: 300px; overflow-y: auto;">
+                                <ul class="list-unstyled mb-0" id="notification-menu">
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="dropdown-footer">
+                            <a href="#">Show all notifications</a>
+                        </li>
                     </ul><!-- End Notification Dropdown Items -->
 
                 </li><!-- End Notification -->
@@ -230,8 +240,9 @@
     <script th:src="@{'/assets/vendor/bootstrap/js/bootstrap.bundle.min.js'}"></script>
     <script th:src="@{'/assets/vendor/simple-datatables/simple-datatables.js'}"></script>
     <script th:src="@{'/assets/vendor/tinymce/tinymce.min.js'}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script th:src="@{'/assets/vendor/chart.js/chart.umd.js'}"></script>
+    <script th:src="@{'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js'}"></script>
+    <script th:src="@{'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js'}"></script>
 
     <!-- Template Main JS File -->
     <script th:src="@{'/assets/js/main.js'}"></script>

@@ -11,6 +11,8 @@ import com.itemManagement.repository.OrderRepository;
 import com.itemManagement.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +27,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-
     public NotificationService(OrderRepository orderRepository, UserRepository userRepository, NotificationRepository notificationRepository, SimpMessagingTemplate messagingTemplate) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
@@ -36,13 +37,14 @@ public class NotificationService {
     @Transactional
     public void saveNotification(Long orderId){
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
-
-        //add account is enable later
-        Optional<User> optionalEmployee = userRepository.findById(2L);
-
-        if(optionalOrder.isPresent() && optionalEmployee.isPresent()){
+        if(optionalOrder.isPresent()){
             Order order = optionalOrder.get();
-            User employee = optionalEmployee.get();
+
+            List<User> employees = userRepository.findByIsEnabledTrueAndRolesAuthority("EMPLOYEE");
+
+            //algorithm to assign job to available admin here
+            User employee = employees.get(1);
+
 
             Notification notification = new Notification(
                             employee,
@@ -56,32 +58,41 @@ public class NotificationService {
             // Send notification via webSocket
             sendNotificationUpdate(employee.getId());
         }
-
     }
 
-    public List<Notification> getUnreadNotifications(Long employeeId){
-        return notificationRepository.findByStatusAndUser_Id(NotificationStatusEnum.NEW,employeeId);
-    }
+    public void sendNotificationUpdate(Long userId) {
 
-    @Transactional
-    public void readNotification(Long notificationId, Long employeeId) {
-//        Notification notification = notificationRepository.findById(notificationId)
-//                .orElseThrow(() -> new RuntimeException("Notification not found"));
-//
-//        notification.setStatus(NotificationStatusEnum.READ);
-//        notificationRepository.save(notification);
-//
-//        // Send updated notification via webSocket
-//        sendNotificationUpdate(employeeId);
-    }
-
-    private void sendNotificationUpdate(Long employeeId) {
-
-        List<Notification> notifications =  getUnreadNotifications(2L);
+        List<Notification> notifications =  getUnreadNotifications(userId);
         List<ShortNotification> shortNotifications = convertNotificationToShortNotification(notifications);
+
+        System.out.println(notifications);
 
         ResponseNotification responseNotification = new ResponseNotification(shortNotifications.size(),shortNotifications);
         messagingTemplate.convertAndSend("/topic/notifications", responseNotification);
+    }
+
+    public List<Notification> getUnreadNotifications(Long userId){
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            List<Notification> notifications = notificationRepository.findByStatusAndUser_Id(
+                    NotificationStatusEnum.NEW,
+                    user.getId()
+            );
+            return notifications;
+        }
+        return List.of();
+    }
+
+    @Transactional
+    public void readNotification(Long notificationId, Long userId) {
+        Optional<Notification> optionalNotification = notificationRepository.findById(notificationId);
+        if(optionalNotification.isPresent()){
+            Notification notification = optionalNotification.get();
+            notification.setStatus(NotificationStatusEnum.READ);
+            notificationRepository.save(notification);
+            sendNotificationUpdate(userId);
+        }
     }
 
     public List<ShortNotification> convertNotificationToShortNotification(List<Notification> notifications){

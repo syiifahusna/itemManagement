@@ -151,6 +151,11 @@ h6 {
   background-color: #f6f9ff;
 }
 
+.notification-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 @media (min-width: 768px) {
   .dropdown-menu-arrow::before {
     content: "";

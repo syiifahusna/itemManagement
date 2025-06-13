@@ -5,7 +5,7 @@ let isSubscribed = false;
 // Initialize connection when page loads
 document.addEventListener('DOMContentLoaded', function() {
     connect();
-    getUnreadNotification()
+    getUnreadNotification();
 });
 
 function connect() {
@@ -23,13 +23,13 @@ function connect() {
             isSubscribed = true;
         }
     }, function(error) {
-        console.log('Connection error:', error);
+        console.error('Connection error:', error);
         setTimeout(connect, 5000);
     });
 }
 
 function getUnreadNotification(){
-    fetch('/notification/get')
+    fetch('/user/notification/getunread')
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -45,21 +45,20 @@ function getUnreadNotification(){
 function updateNotification(data){
 
     const notificationBadge = document.getElementById("notification-badge");
+    const notificationHeader = document.getElementById("notification-header")
     const notificationMenu = document.getElementById("notification-menu")
 
     notificationBadge.textContent = data.countNotification
-    notificationMenu.innerHtml =   ``;
-    notificationMenu.innerHtml =+ `
-                <li class="dropdown-header">
-                    "You have ${data.countNotification} new notifications"
-                </li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>`;
+    notificationHeader.innerHTML =  `
+            You have ${data.countNotification} new notifications
+            <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+    `
 
-    data.notifications.forEach(noti => {
-        notificationMenu.innerHtml =+ `
-                    <li class="notification-item">
+    notificationMenu.innerHTML = '';
+    notificationMenu.innerHTML +=   '';
+            data.notifications.forEach(noti => {
+                notificationMenu.innerHTML += `
+                    <li class="notification-item" onclick="readNotification(${noti.id})">
                         <i class="bi bi-exclamation-circle text-warning"></i>
                         <div>
                             <h4>${noti.title}</h4>
@@ -69,7 +68,28 @@ function updateNotification(data){
                     </li>
                     <li>
                         <hr class="dropdown-divider">
-                    </li>`
-    });
+                    </li>`;
+            });
 
+}
+
+function readNotification(id){
+
+    fetch('/user/notification/read/' + id, {
+        method: 'GET'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        return response.json();
+    })
+    .then(data => {
+        console.log("Success:", data);
+        updateNotification(data);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
 }

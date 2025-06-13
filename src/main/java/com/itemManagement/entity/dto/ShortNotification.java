@@ -79,5 +79,14 @@ public class ShortNotification {
         this.timePass = timePass;
     }
 
-
+    @Override
+    public String toString() {
+        return "ShortNotification{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", message='" + message + '\'' +
+                ", createdTime=" + createdTime +
+                ", timePass='" + timePass + '\'' +
+                '}';
+    }
 }
