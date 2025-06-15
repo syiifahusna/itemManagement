@@ -36,7 +36,6 @@ public class NotificationRestController {
     @GetMapping("/read/{id}")
     public ResponseEntity<ResponseNotification> readNotification(@PathVariable("id") Long id,
                                                                  Authentication authentication){
-        System.out.println("requested ..... to update ...........");
         User user = (User) authentication.getPrincipal();
         notificationService.readNotification(id,user.getId());
 

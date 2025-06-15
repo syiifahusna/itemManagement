@@ -11,8 +11,6 @@ import com.itemManagement.repository.OrderRepository;
 import com.itemManagement.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,6 +24,9 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
+
+    private int currentIndex;
+    private final Object lock = new Object();
 
     public NotificationService(OrderRepository orderRepository, UserRepository userRepository, NotificationRepository notificationRepository, SimpMessagingTemplate messagingTemplate) {
         this.orderRepository = orderRepository;
@@ -42,21 +43,25 @@ public class NotificationService {
 
             List<User> employees = userRepository.findByIsEnabledTrueAndRolesAuthority("EMPLOYEE");
 
-            //algorithm to assign job to available admin here
-            User employee = employees.get(1);
+            if(employees.isEmpty()){
+                //throw new no employee available // catch in aop
+            }else{
 
+                //assign job to available employee
+                User employee = assignOrder(employees,order);
 
-            Notification notification = new Notification(
-                            employee,
-                            "New Order Received",
-                            "Check new order from " + order.getUser().getUsername()
-                                    + " with order id " + order.getId(),
-                            NotificationStatusEnum.NEW);
+                Notification notification = new Notification(
+                        employee,
+                        "New Order Received",
+                        "Check new order from " + order.getUser().getUsername()
+                                + " with order id " + order.getId(),
+                        NotificationStatusEnum.NEW);
 
-            notificationRepository.save(notification);
+                notificationRepository.save(notification);
 
-            // Send notification via webSocket
-            sendNotificationUpdate(employee.getId());
+                // Send notification via webSocket
+                sendNotificationUpdate(employee.getId());
+            }
         }
     }
 
@@ -64,8 +69,6 @@ public class NotificationService {
 
         List<Notification> notifications =  getUnreadNotifications(userId);
         List<ShortNotification> shortNotifications = convertNotificationToShortNotification(notifications);
-
-        System.out.println(notifications);
 
         ResponseNotification responseNotification = new ResponseNotification(shortNotifications.size(),shortNotifications);
         messagingTemplate.convertAndSend("/topic/notifications", responseNotification);
@@ -110,5 +113,17 @@ public class NotificationService {
                 .collect(Collectors.toList());
 
         return shortNotifications;
+    }
+
+    private User assignOrder(List<User> employees,Order order) {
+        synchronized (lock) {
+            User selectedEmployee = employees.get(currentIndex);
+
+            // Move to next admin in round-robin fashion
+            currentIndex = (currentIndex + 1) % employees.size();
+
+            //return the selected employee
+            return selectedEmployee;
+        }
     }
 }

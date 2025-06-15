@@ -103,8 +103,20 @@ public class InitializeConfig {
                 roleClient,
                 true,true,true,true);
 
+        User user4 = new User("Employee2",
+                "employee2@mail.com",
+                "employee2",
+                passwordEncoder.encode("employee2123"),
+                new Image("/emp1.jpg"),
+                roleEmp,
+                true,true,true,true);
+
+
+
+
+
         List<User> userList = new ArrayList<>(
-                Arrays.asList(user1,user2,user3)
+                Arrays.asList(user1,user2,user3,user4)
         );
 
        userRepository.saveAll(userList);

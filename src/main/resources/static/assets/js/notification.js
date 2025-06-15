@@ -50,9 +50,7 @@ function updateNotification(data){
 
     notificationBadge.textContent = data.countNotification
     notificationHeader.innerHTML =  `
-            You have ${data.countNotification} new notifications
-            <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
-    `
+            You have ${data.countNotification} new notifications`
 
     notificationMenu.innerHTML = '';
     notificationMenu.innerHTML +=   '';
@@ -82,14 +80,14 @@ function readNotification(id){
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
         return response.json();
     })
     .then(data => {
-        console.log("Success:", data);
         updateNotification(data);
     })
     .catch(error => {
         console.error("Error:", error);
     });
+
+    window.location.href = `/user/notifications`;
 }
